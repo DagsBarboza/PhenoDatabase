@@ -25,7 +25,7 @@ public class MyUploader implements Receiver, SucceededListener {
 	public String fileDirectory;
 
 	public String data;
-
+	
 	private HashMap<String, SQLContainer> container;
 
 	public MyUploader(HashMap<String, SQLContainer> sqlContainer,
@@ -91,7 +91,7 @@ public class MyUploader implements Receiver, SucceededListener {
 
 		FileOutputStream fos = null;
 
-		String location = "E:\\Dags\\test\\";
+		String location = "E:\\phenodb_files";
 		File folder = new File(location);
 		boolean created = true;
 		try {

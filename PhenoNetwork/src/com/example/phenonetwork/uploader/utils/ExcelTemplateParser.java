@@ -121,8 +121,8 @@ public class ExcelTemplateParser {
 
 		// Get data from excel file
 		workbook = Workbook.getWorkbook(new File(fileDirectory));
-		Sheet sheet = workbook.getSheet(0);
-		Cell[] cells = sheet.getColumn(0);
+		Sheet sheet = workbook.getSheet(1);
+//		Cell[] cells = sheet.getColumn(0);
 
 		container.get("phenotype").addRowIdChangeListener(
 				new RowIdChangeListener() {
@@ -134,79 +134,81 @@ public class ExcelTemplateParser {
 					}
 				});
 
-		container.get("scale").addRowIdChangeListener(
-				new RowIdChangeListener() {
+//		container.get("scale").addRowIdChangeListener(
+//				new RowIdChangeListener() {
+//
+//					@Override
+//					public void rowIdChange(RowIdChangeEvent event) {
+//						scaleId = Integer.parseInt(event.getNewRowId()
+//								.toString());
+//					}
+//				});
 
-					@Override
-					public void rowIdChange(RowIdChangeEvent event) {
-						scaleId = Integer.parseInt(event.getNewRowId()
-								.toString());
-					}
-				});
-
-		String scaleUnit = "";
+		//String scaleUnit = "";
 
 		// write data to container
-		for (Cell cell : cells) {
-			if (!cell.getContents().equals("")) {
-
-				scaleId = 0;
-
+		/**
+		 * Change this:
+		 * Change to accept dynamic values
+		 * 
+		 * Values are static and following precisely the excel template 
+		 * 
+		 * */
+		
+		int row = 8;
+		int colVar = 0;
+		int colTermName = 2;
+		int colDef = 3;
+		int maxRow = 57;
+		
+	
+		for(int i=row; i<=maxRow; i++) {
+			
+		
+			
 				Object newTrait = container.get("phenotype").addItem();
 				item = container.get("phenotype").getItem(newTrait);
 
-//				Object variate = container.get("variates").addItem();
-//				variateItem = container.get("variates").getItem(variate);
 
-				item.getItemProperty("traitName").setValue(cell.getContents());
+				item.getItemProperty("traitName").setValue(sheet.getCell(colTermName,i ).getContents());
 
-				Cell acc = sheet.findCell(cell.getContents());
-				item.getItemProperty("traitAcronym").setValue(
-						sheet.getCell(acc.getColumn() + 1, acc.getRow())
-								.getContents());
+				//Cell acc = sheet.findCell(cell.getContents());
+				item.getItemProperty("traitAcronym").setValue(sheet.getCell(colVar, i).getContents());
+				item.getItemProperty("traitDescription").setValue(sheet.getCell(colDef, i).getContents());
 
 				// adding to scale
 
-				scaleUnit = sheet.getCell(acc.getColumn() + 2, acc.getRow())
-						.getContents();
+//				scaleUnit = sheet.getCell(acc.getColumn() + 2, acc.getRow())
+//						.getContents();
 
-				if (!scaleUnit.equals("") && scaleUnit != null) {
-
-					container.get("scale").addContainerFilter(
-							new SimpleStringFilter("scaleName", scaleUnit,
-									true, false));
-
-					if (container.get("scale").size() == 0) {
-						container.get("scale").removeAllContainerFilters();
-						System.out.println(scaleUnit);
-						Object newScale = container.get("scale").addItem();
-						scaleItem = container.get("scale").getItem(newScale);
-
-						scaleItem.getItemProperty("scaleName").setValue(
-								scaleUnit);
-
-						container.get("scale").commit();
-					} else {
-						System.out.println(container.get("scale").getIdByIndex(
-								0));
-						scaleId = Integer.parseInt(container.get("scale")
-								.getIdByIndex(0).toString());
-					}
-
-					container.get("scale").removeAllContainerFilters();
-
-				}
+//				if (!scaleUnit.equals("") && scaleUnit != null) {
+//
+//					container.get("scale").addContainerFilter(
+//							new SimpleStringFilter("scaleName", scaleUnit,
+//									true, false));
+//
+//					if (container.get("scale").size() == 0) {
+//						container.get("scale").removeAllContainerFilters();
+//						Object newScale = container.get("scale").addItem();
+//						scaleItem = container.get("scale").getItem(newScale);
+//
+//						scaleItem.getItemProperty("scaleName").setValue(
+//								scaleUnit);
+//
+//						container.get("scale").commit();
+//					} else {
+//						System.out.println(container.get("scale").getIdByIndex(
+//								0));
+//						scaleId = Integer.parseInt(container.get("scale")
+//								.getIdByIndex(0).toString());
+//					}
+//
+//					container.get("scale").removeAllContainerFilters();
+//
+//				
 
 				container.get("phenotype").commit();
-
-//				variateItem.getItemProperty("traitId").setValue(traitId);
-//
-//				if (!scaleUnit.equals("") && scaleUnit != null)
-//					variateItem.getItemProperty("scaleId").setValue(scaleId);
-//
-//				container.get("variates").commit();
-
-			}
+			
 		}
 
 		return true;

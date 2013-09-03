@@ -10,8 +10,13 @@ import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
 
+import com.example.phenonetwork.uploader.UploadGermplasm;
+import com.example.phenonetwork.uploader.UploadObservation;
+import com.example.phenonetwork.uploader.UploadStudy;
+import com.example.phenonetwork.uploader.UploadTraits;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate.RowIdChangeEvent;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate.RowIdChangeListener;
@@ -53,9 +58,10 @@ public class ExcelTemplateParser {
 				accessionlabel);
 
 		SQLContainer sqlContainer = container.get(data);
-		DbUploader.uploadGermplasm(sqlContainer, sheet, label);
-		DbUploader.uploadAccession(container.get("accession"), sheet,
-				accessionlabel);
+		UploadGermplasm.upload(sqlContainer, sheet, label);
+
+		// DbUploader.uploadAccession(container.get("accession"), sheet,
+		// accessionlabel);
 
 		return true;
 	}
@@ -66,41 +72,40 @@ public class ExcelTemplateParser {
 			IOException {
 		Workbook workbook;
 
-		System.out.println(fileDirectory);
 		workbook = Workbook.getWorkbook(new File(fileDirectory));
-		System.out.println(">>>");
 		Sheet sheet = workbook.getSheet(0);
-		System.out.println(">>>?");
 		// Identify what to expect in the excel for germplasm Information
 		HashMap<String, Cell> label = new HashMap<String, Cell>();
-		label.put("Investigator", null);
-		label.put("Sampling Date", null);
-		label.put("Study Name", null);
-
-		// getLabel Location in the excel
+		label.put("Experimental location", null);
+		label.put("Description", null);
+		label.put("Study", null);
 
 		label = ExcelHeaderParser.getLabelValue(sheet, label);
-		// label = getLabelLocation(sheet, label);
 
-		// SQLContainer sqlContainer = container.get(data);
-		Object itemId = DbUploader.uploadStudyDefinition(
-				container.get("study"), sheet, label);
+		
 
-		System.out.println("id:" + itemId);
+		
+		Object itemId = UploadStudy
+				.upload(container.get("study"), sheet, label);
 
-		container.get("study").addContainerFilter(
-				new SimpleStringFilter("studyId", itemId.toString(), true,
-						false));
+		// container.get("study").addContainerFilter(
+		// new SimpleStringFilter("studyId", itemId.toString(), true,
+		// false));
+		//
+		// Boolean exist = false;
+		//
+		// if (container.get("study").size() > 0) {
+		// container.get("study").removeAllContainerFilters();
+		// exist = true;
+		// }
 
-		Boolean exist = false;
+		
+		if (itemId != null && !itemId.equals(""))
 
-		if (container.get("study").size() > 0) {
-			container.get("study").removeAllContainerFilters();
-			exist = true;
-		}
-
-		if (exist)
-			DbUploader.uploadDateset(container, workbook.getSheet(1), label,
+			UploadObservation.upload(
+					container,
+					workbook.getSheet(1),
+					label,
 					itemId);
 
 		container.get("study").removeAllContainerFilters();
@@ -115,101 +120,14 @@ public class ExcelTemplateParser {
 			SQLException {
 		Workbook workbook;
 
-		Item item;
 		Item scaleItem;
 		Item variateItem;
 
 		// Get data from excel file
 		workbook = Workbook.getWorkbook(new File(fileDirectory));
 		Sheet sheet = workbook.getSheet(1);
-//		Cell[] cells = sheet.getColumn(0);
 
-		container.get("phenotype").addRowIdChangeListener(
-				new RowIdChangeListener() {
-
-					@Override
-					public void rowIdChange(RowIdChangeEvent event) {
-						traitId = Integer.parseInt(event.getNewRowId()
-								.toString());
-					}
-				});
-
-//		container.get("scale").addRowIdChangeListener(
-//				new RowIdChangeListener() {
-//
-//					@Override
-//					public void rowIdChange(RowIdChangeEvent event) {
-//						scaleId = Integer.parseInt(event.getNewRowId()
-//								.toString());
-//					}
-//				});
-
-		//String scaleUnit = "";
-
-		// write data to container
-		/**
-		 * Change this:
-		 * Change to accept dynamic values
-		 * 
-		 * Values are static and following precisely the excel template 
-		 * 
-		 * */
-		
-		int row = 8;
-		int colVar = 0;
-		int colTermName = 2;
-		int colDef = 3;
-		int maxRow = 57;
-		
-	
-		for(int i=row; i<=maxRow; i++) {
-			
-		
-			
-				Object newTrait = container.get("phenotype").addItem();
-				item = container.get("phenotype").getItem(newTrait);
-
-
-				item.getItemProperty("traitName").setValue(sheet.getCell(colTermName,i ).getContents());
-
-				//Cell acc = sheet.findCell(cell.getContents());
-				item.getItemProperty("traitAcronym").setValue(sheet.getCell(colVar, i).getContents());
-				item.getItemProperty("traitDescription").setValue(sheet.getCell(colDef, i).getContents());
-
-				// adding to scale
-
-//				scaleUnit = sheet.getCell(acc.getColumn() + 2, acc.getRow())
-//						.getContents();
-
-//				if (!scaleUnit.equals("") && scaleUnit != null) {
-//
-//					container.get("scale").addContainerFilter(
-//							new SimpleStringFilter("scaleName", scaleUnit,
-//									true, false));
-//
-//					if (container.get("scale").size() == 0) {
-//						container.get("scale").removeAllContainerFilters();
-//						Object newScale = container.get("scale").addItem();
-//						scaleItem = container.get("scale").getItem(newScale);
-//
-//						scaleItem.getItemProperty("scaleName").setValue(
-//								scaleUnit);
-//
-//						container.get("scale").commit();
-//					} else {
-//						System.out.println(container.get("scale").getIdByIndex(
-//								0));
-//						scaleId = Integer.parseInt(container.get("scale")
-//								.getIdByIndex(0).toString());
-//					}
-//
-//					container.get("scale").removeAllContainerFilters();
-//
-//				
-
-				container.get("phenotype").commit();
-			
-		}
+		UploadTraits.upload(container.get("trait"), sheet, null);
 
 		return true;
 	}

@@ -27,9 +27,9 @@ public class DefaultView extends CustomComponent implements View {
 	
 	public DefaultView(final HashMap<String, SQLContainer> container){
 		
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setSizeUndefined();
-		layout.setWidth("100%");
+		VerticalLayout layout = new VerticalLayout();
+		layout.setSizeFull();
+		layout.setMargin(true);
 		
 		setCompositionRoot(layout);
 		
@@ -39,16 +39,7 @@ public class DefaultView extends CustomComponent implements View {
 		vLayout.addComponent(new Label("<br>Select file to upload:", ContentMode.HTML));
 		Upload upload = new Upload();
 		vLayout.addComponent(upload);
-		vLayout.addComponent(new Button("Launch Scanner", new ClickListener() {
-			
-			@Override
-			public void buttonClick(ClickEvent event) {
-				DetectedPage dp = new DetectedPage();
 				
-				
-			}
-		}));
-		
 		
 		
 		vLayout.setSizeFull();
@@ -89,7 +80,18 @@ public class DefaultView extends CustomComponent implements View {
 		
 		
 		
+		
+		
 		layout.addComponent(leftLayout);
+		layout.addComponent(new Button("Launch Scanner", new ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				DetectedPage dp = new DetectedPage();
+				
+				
+			}
+		}));
 		layout.addComponent(vLayout);
 		
 		MyUploader uploader = new MyUploader(container, "germplasm");

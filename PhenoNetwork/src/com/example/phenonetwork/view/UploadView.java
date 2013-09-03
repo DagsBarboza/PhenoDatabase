@@ -48,19 +48,7 @@ public class UploadView extends CustomComponent implements View {
 		newLayout.setMargin(true);
 
 		Tree dir = new Tree("Directories/Datasets");
-		// dir.addItemClickListener(new ItemClickListener() {
-		//
-		// @Override
-		// public void itemClick(ItemClickEvent event) {
-		// System.out.println("item click: "+event.getItemId());
-		// System.out.println("item click: "+event.getPropertyId());
-		// System.out.println("item click: "+event.getSource());
-		//
-		// }
-		// });
-		//
-		// dir.addItem("test");
-
+		
 		FilesystemContainer filesystemContainer = new FilesystemContainer(
 				new File("E:\\Dags"));
 		Tree tree = new Tree(null, filesystemContainer);

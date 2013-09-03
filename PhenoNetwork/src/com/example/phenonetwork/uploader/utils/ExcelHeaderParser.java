@@ -27,8 +27,10 @@ public class ExcelHeaderParser {
 		
 
 		for (Map.Entry<String, Cell> entry : label.entrySet()) {
-			Cell cell = sheet.findCell(entry.getKey().toString());
+			System.out.println("label"+ label.entrySet());
 			
+			Cell cell = sheet.findCell(entry.getKey().toString());
+
 			if (cell != null)
 				label.put(entry.getKey().toString(), cell);
 		}

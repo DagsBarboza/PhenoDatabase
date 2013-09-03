@@ -24,23 +24,17 @@ public class DButils {
 
 			TableQuery tq = new TableQuery("trait", pool);
 			SQLContainer container = new SQLContainer(tq);
-			sqlContainers.put("phenotype", container);
+			sqlContainers.put("trait", container);
 
 			TableQuery tq2 = new TableQuery("germplasm", pool);
 			SQLContainer container2 = new SQLContainer(tq2);
 			sqlContainers.put("germplasm", container2);
 
-//			TableQuery tq3 = new TableQuery("accession", pool);
-//			SQLContainer container3 = new SQLContainer(tq3);
-//			sqlContainers.put("accession", container3);
 
 			TableQuery tq4 = new TableQuery("study", pool);
 			SQLContainer container4 = new SQLContainer(tq4);
 			sqlContainers.put("study", container4);
 
-//			TableQuery tq5 = new TableQuery("observation", pool);
-//			SQLContainer container5 = new SQLContainer(tq5);
-//			sqlContainers.put("observation", container5);
 
 			TableQuery tq6 = new TableQuery("variates", pool);
 			SQLContainer container6 = new SQLContainer(tq6);
@@ -50,10 +44,6 @@ public class DButils {
 			SQLContainer container7 = new SQLContainer(tq7);
 			sqlContainers.put("scale", container7);
 
-//			FreeformQuery tq8 = new FreeformQuery("call testProc()", pool,
-//					"germplasmName");
-//			SQLContainer container8 = new SQLContainer(tq8);
-//			sqlContainers.put("viewTest", container8);
 
 			return sqlContainers;
 		} catch (SQLException e) {
@@ -91,7 +81,7 @@ public class DButils {
 		String traitName = "";
 		StringBuilder concatString = new StringBuilder();
 		int i = 0;
-		SQLContainer traitContainer = container.get("phenotype");
+		SQLContainer traitContainer = container.get("trait");
 		SQLContainer variateContainer = container.get("variates");
 
 		while (i < container.get("variates").size()) {

@@ -41,24 +41,26 @@ public class MyUploader implements Receiver, SucceededListener {
 			if (data.equals("germplasm"))
 				uploaded = ExcelTemplateParser.checkGermplasmIfUploaded(
 						fileDirectory, container, data);
-			if (data.equals("phenotype"))
+			if (data.equals("trait"))
 				uploaded = ExcelTemplateParser.checkPhenotypeIfUploaded(
 						fileDirectory, container, data);
 			if (data.equals("accession"))
 				uploaded = ExcelTemplateParser.checkPhenotypeIfUploaded(
 						fileDirectory, container, data);
 			if (data.equals("study"))
-
 				uploaded = ExcelTemplateParser.checkStudyIfUploaded(
 						fileDirectory, container, data);
 		} catch (UnsupportedOperationException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (BiffException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			
+			if (e.getMessage().startsWith("Duplicate entry"))
+				System.out.println("Existing record...");
+			
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

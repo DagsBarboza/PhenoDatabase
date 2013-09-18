@@ -32,11 +32,15 @@ import com.vaadin.ui.Window;
 public class PhenonetworkUI extends UI {
 
 	Window notifications;
+	Window login;
 	
 	@Override
 	protected void init(VaadinRequest request) {
 
+//		setLoginWindow();
 		
+		
+//		addWindow(login);
 		VerticalLayout maintLayout = new VerticalLayout();
 		maintLayout.setSizeFull();
 
@@ -202,6 +206,25 @@ public class PhenonetworkUI extends UI {
 		navigator.addView("SearchView", new SearchView(sqlContainer));
 		navigator.addView("", new DefaultView(sqlContainer));
 
+	}
+
+	private void setLoginWindow() {
+		login = new Window();
+		
+		VerticalLayout layout = new VerticalLayout();
+		
+//		layout.addComponent();
+		login.setCaption("LOGIN");
+		login.setModal(true);
+		login.setWidth("300px");
+		login.setHeight("300px");
+		login.addStyleName("loginWindow");
+		login.setClosable(false);
+		login.setResizable(false);
+		login.setDraggable(false);
+		login.setCloseShortcut(KeyCode.ESCAPE, null);
+		login.setContent(layout);
+		
 	}
 
 }

@@ -1,6 +1,8 @@
 package com.example.phenonetwork.db;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import jxl.Cell;
 import jxl.Sheet;
@@ -31,6 +33,14 @@ public class GetStudy {
 		container.removeAllContainerFilters();
 		
 		return studySize;
+	}
+
+	public List getAllStudyName() {
+		List result = new ArrayList();
+		container.removeAllContainerFilters();
+		result = container.getItemIds(0, container.size());
+		return result;
+		
 	}
 
 }

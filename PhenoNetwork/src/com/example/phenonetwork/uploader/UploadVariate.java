@@ -2,81 +2,96 @@ package com.example.phenonetwork.uploader;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import jxl.Cell;
 import jxl.Sheet;
 
+import com.example.phenonetwork.db.GetTrait;
 import com.vaadin.data.Item;
-import com.vaadin.data.util.filter.Like;
-import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.query.QueryDelegate.RowIdChangeEvent;
+import com.vaadin.data.util.sqlcontainer.query.QueryDelegate.RowIdChangeListener;
 
 public class UploadVariate {
-	
-	public static void upload(HashMap<String, SQLContainer> container,
-			Sheet sheet, HashMap<String, Cell> label, Object itemId2) {
 
-		int columnRows = 0;
+	@SuppressWarnings("rawtypes")
+	public static HashMap<String, HashMap> upload(
+			HashMap<String, SQLContainer> container, Object itemId,
+			Sheet sheet, int datasetId) {
 
-		Cell cell;
+		SQLContainer variateTable = container.get("variates");
+		SQLContainer traitTable = container.get("trait");
+
+		variateTable.addRowIdChangeListener(new RowIdChangeListener() {
+			
+			@Override
+			public void rowIdChange(RowIdChangeEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
-		HashMap<Integer, String> notFound = new HashMap<Integer, String>();
+		
+		HashMap<String, HashMap> traitMap = new HashMap<String, HashMap>();
+		
+		
+		HashMap<String, Integer> traitList = new HashMap<String, Integer>();
+		HashMap<String, Integer> traitIds = new HashMap<String, Integer>();
 
-		Item variateItem;
-		while (columnRows < sheet.getColumns()) {
+		GetTrait traitsObj = new GetTrait(traitTable);
 
-			cell = sheet.getCell(columnRows, 0);
+		for (Cell cell : sheet.getRow(0)) {
 
-			container.get("trait").addContainerFilter(
-					new Or(
-							new Like("traitName", "%" + cell.getContents()
-									+ "%"), new Like("traitAcronym", "%"
-									+ cell.getContents() + "%")));
+			if (traitsObj.countTraitByName(cell.getContents()) > 0
+					|| traitsObj.countTraitByAcronym(cell.getContents()) > 0) {
 
-//			if (container.get("trait").size() > 0) {
-//				exist.put(columnRows, container.get("phenotype")
-//						.getIdByIndex(0).toString());
-//				// System.out.println("ID>>"+
-//				// container.get("phenotype").getIdByIndex(0));
-//			} else
-//				notFound.put(columnRows, null);
+				traitList.put(cell.getContents(), cell.getColumn());
 
-			container.get("trait").removeAllContainerFilters();
+				int traitId = traitsObj.getTraitIdByName(cell.getContents());
 
-			/*
-			 * Adding variate Item
-			 */
+				traitIds.put(cell.getContents(), traitId);
+			}
+		}
 
-//			if (exist.get(columnRows) != null
-//					&& !exist.get(columnRows).equals("")) {
-//
-//				Object variateObj = container.get("variates").addItem();
-//
-//				variateItem = container.get("variates").getItem(variateObj);
-//
-//				variateItem.getItemProperty("traitId").setValue(
-//						Integer.parseInt(exist.get(columnRows).toString()));
-//
-//				variateItem.getItemProperty("studyName").setValue(itemId2);
-//
-//			}
+		// Iterate through the list of traits
 
-			// Adding Variate End//
+		Iterator it = traitIds.entrySet().iterator();
 
-			columnRows++;
+		Item item2;
+
+		while (it.hasNext()) {
+
+			Map.Entry entry = (Map.Entry) it.next();
+
+			Object variate = variateTable.addItem();
+			item2 = variateTable.getItem(variate);
+
+			item2.getItemProperty("studyName").setValue(itemId);
+
+			item2.getItemProperty("datasetId").setValue(datasetId);
+
+			item2.getItemProperty("traitId").setValue(
+					(Integer) entry.getValue());
+
 		}
 
 		try {
-			container.get("variates").commit();
+			variateTable.commit();
 		} catch (UnsupportedOperationException e) {
-			System.err
-					.println("Error uploading Dataset (DBUPLOADER CLASS). Unsupported operation");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			System.err
-					.println("Error uploading Dataset (DBUPLOADER CLASS). There might be a problem with SQL");
+			System.out.println("SQL error: uploading of variate values");
 			e.printStackTrace();
 		}
+
+		traitMap.put("traitList", traitList);
+		traitMap.put("traitIds", traitIds);
+		
+		return traitMap;
+
 	}
 
 }

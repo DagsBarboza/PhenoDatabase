@@ -25,6 +25,8 @@ public class StudyView extends CustomComponent implements View {
 	
 	public StudyView(final HashMap<String, SQLContainer> container){
 		
+		VerticalLayout layout = new VerticalLayout();
+		
 		VerticalLayout treevLayout = new VerticalLayout();
 		treevLayout.setHeight("100%");
 		treevLayout.setWidth("350px");
@@ -49,31 +51,22 @@ public class StudyView extends CustomComponent implements View {
 				table.setContainerDataSource(DButils.getFreeFormQuery(event.getItemId().toString(), container));
 				container.get("variates").removeAllContainerFilters();
 				
+				vLayout2.removeAllComponents();
 				vLayout2.addComponent(table);
 				
 			}
 		}); 
 		
 		
+		layout.addComponent(treevLayout);
+		layout.addComponent(vLayout2);
+		
 		TextField searchStudy = new TextField("Search");
 		treevLayout.addComponent(searchStudy);
 		treevLayout.addComponent(tree);
 		
-		HorizontalSplitPanel vSplitPanel = new HorizontalSplitPanel();
-		vSplitPanel.setWidth("100%");
-		vSplitPanel.setHeight("100%");
 		
-//		vSplitPanel.setLocked(true);
-		
-		setCompositionRoot(vSplitPanel);
-		
-		
-		vSplitPanel.addComponent(treevLayout);
-		vSplitPanel.addComponent(vLayout2);
-		
-		vSplitPanel.getFirstComponent().setWidth("20%");
-		
-		
+		setCompositionRoot(layout);
 		
 	}
 

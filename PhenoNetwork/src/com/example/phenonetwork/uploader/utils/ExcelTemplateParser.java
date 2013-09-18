@@ -10,10 +10,14 @@ import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
 
+import com.example.phenonetwork.db.GetDataset;
+import com.example.phenonetwork.db.GetStudy;
+import com.example.phenonetwork.uploader.UploadDataset;
 import com.example.phenonetwork.uploader.UploadGermplasm;
-import com.example.phenonetwork.uploader.UploadObservation;
+import com.example.phenonetwork.uploader.UploadObservationDate;
 import com.example.phenonetwork.uploader.UploadStudy;
 import com.example.phenonetwork.uploader.UploadTraits;
+import com.example.phenonetwork.uploader.UploadVariate;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.util.sqlcontainer.RowId;
@@ -74,39 +78,48 @@ public class ExcelTemplateParser {
 
 		workbook = Workbook.getWorkbook(new File(fileDirectory));
 		Sheet sheet = workbook.getSheet(0);
-		// Identify what to expect in the excel for germplasm Information
-		HashMap<String, Cell> label = new HashMap<String, Cell>();
-		label.put("Experimental location", null);
-		label.put("Description", null);
-		label.put("Study", null);
+		Sheet datasheet = workbook.getSheet(1);
 
-		label = ExcelHeaderParser.getLabelValue(sheet, label);
+		HashMap<String, Cell> excelHeader = new HashMap<String, Cell>();
+		excelHeader.put("Experimental location", null);
+		excelHeader.put("Description", null);
+		excelHeader.put("Study", null);
+
+		excelHeader = ExcelHeaderParser.getLabelValue(sheet, excelHeader);
+
+		Object itemId = new Object();
+
+		//CHECK IF STUDY IS ALREADY EXISTING
+		GetStudy gs = new GetStudy(container.get("study"));
+		
+		if (gs.countStudyByName(sheet, excelHeader) == 0)
+			itemId = UploadStudy.upload(container.get("study"), sheet,
+					excelHeader);
+		else
+			itemId = sheet.getCell(excelHeader.get("Study").getColumn() + 1,
+					excelHeader.get("Study").getRow()).getContents();
+
+		//CHECK IF DATASET IS ALREADY EXISTING
+		int datasetId;
+		GetDataset gd = new GetDataset(container.get("dataset"));
+		
+		if (gd.countDatasetByStudyName(itemId,
+				workbook.getSheet(1).getName() ) == 0 )
+			datasetId = UploadDataset.upload(container.get("dataset"), itemId,
+					workbook.getSheet(1).getName());
+		else
+			datasetId = gd.getDatasetIdByName(itemId, workbook.getSheet(1).getName());
 
 		
-
 		
-		Object itemId = UploadStudy
-				.upload(container.get("study"), sheet, label);
+		HashMap<String, HashMap> trait = UploadVariate.upload(container,
+				itemId, datasheet, datasetId);
 
-		// container.get("study").addContainerFilter(
-		// new SimpleStringFilter("studyId", itemId.toString(), true,
-		// false));
-		//
-		// Boolean exist = false;
-		//
-		// if (container.get("study").size() > 0) {
-		// container.get("study").removeAllContainerFilters();
-		// exist = true;
-		// }
-
-		
-		if (itemId != null && !itemId.equals(""))
-
-			UploadObservation.upload(
-					container,
-					workbook.getSheet(1),
-					label,
-					itemId);
+		if (itemId != null && !itemId.equals("")){
+			//ADD WHAT KING OF OBSERVATION IS TO BE UPLOADED
+			UploadObservationDate.upload(container, workbook.getSheet(1), trait,
+					itemId, datasetId);
+		}
 
 		container.get("study").removeAllContainerFilters();
 

@@ -72,9 +72,7 @@ public class UploadStudy {
 		if (label.get("Study") != null) {
 			
 			input = (Cell) label.get("Study");
-			System.out.println("inserting.."
-					+ sheet.getCell(input.getColumn() + 1, input.getRow())
-							.getContents());
+			
 			item2.getItemProperty("studyName").setValue(
 					sheet.getCell(input.getColumn() + 1, input.getRow())
 							.getContents());

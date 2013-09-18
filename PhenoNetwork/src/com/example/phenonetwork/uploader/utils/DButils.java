@@ -30,19 +30,29 @@ public class DButils {
 			SQLContainer container2 = new SQLContainer(tq2);
 			sqlContainers.put("germplasm", container2);
 
+			TableQuery tq3 = new TableQuery("dataset", pool);
+			SQLContainer container3 = new SQLContainer(tq3);
+			sqlContainers.put("dataset", container3);
 
 			TableQuery tq4 = new TableQuery("study", pool);
 			SQLContainer container4 = new SQLContainer(tq4);
 			sqlContainers.put("study", container4);
-
+			
+			TableQuery tq5 = new TableQuery("observationnumeric", pool);
+			SQLContainer container5 = new SQLContainer(tq5);
+			sqlContainers.put("observationNumeric", container5);
 
 			TableQuery tq6 = new TableQuery("variates", pool);
 			SQLContainer container6 = new SQLContainer(tq6);
 			sqlContainers.put("variates", container6);
-
+			
 			TableQuery tq7 = new TableQuery("scalemeasurement", pool);
 			SQLContainer container7 = new SQLContainer(tq7);
 			sqlContainers.put("scale", container7);
+			
+			TableQuery tq8 = new TableQuery("observationdate", pool);
+			SQLContainer container8 = new SQLContainer(tq8);
+			sqlContainers.put("observationDate", container8);
 
 
 			return sqlContainers;
@@ -57,7 +67,7 @@ public class DButils {
 
 		String concatString = "";
 
-		container.get("variates").addContainerFilter("study_studyId", itemId,
+		container.get("variates").addContainerFilter("studyName", itemId,
 				false, false);
 		concatString = getConcatString(itemId, container);
 		container.get("variates").removeAllContainerFilters();
@@ -65,13 +75,16 @@ public class DButils {
 		// System.out.println(container.get("phenotype").getContainerProperty(obj,
 		// "traitName"));
 
-		String strQuery = "select o.germplasmName, "
-				+ concatString
-				+ "from trait t left join variates v on t.traitId = v.traitId "
-				+ "right join observation o on o.variates_variateId=v.variateId "
-				+ "where v.study_studyid=" + itemId
-				+ " group by o.germplasmName";
-
+//		String strQuery = "select o.value, "
+//				+ concatString
+//				+ "from trait t left join variates v on t.traitId = v.traitId "
+//				+ "right join observationDate o on o.variateId=v.variateId "
+//				+ "where v.studyName='" + itemId
+//				+ "' group by o.value";
+		String strQuery = "select * from observationDate";
+		// o Right Join variates v  On v.variateId=o.variateId where v.studyName='"+ itemId +"'";
+				
+		System.out.println(strQuery);
 		return strQuery;
 
 	}
@@ -123,7 +136,7 @@ public class DButils {
 			pool = new SimpleJDBCConnectionPool("com.mysql.jdbc.Driver",
 					"jdbc:mysql://localhost:3306/prototype_db", "root", "dags");
 			FreeformQuery tq = new FreeformQuery(getStringQuery(itemId,
-					container2), pool, "germplasmName");
+					container2), pool, "variateId");
 			container = new SQLContainer(tq);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
